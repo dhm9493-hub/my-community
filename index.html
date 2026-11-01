@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b08">
+<title>MY COMMUNITY</title>
+
+<style>
+:root {
+  --green: #39ff14;
+  --panel: #111711;
+  --panel-dark: #090e0a;
+  --muted: #aab3aa;
+  --line: #263b2b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+html { scroll-behavior: smooth; }
+body { min-height: 100vh; background: #050705; color: #fff; }
+
+body.welcome-active { overflow: hidden; }
+.welcome-splash {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 42%, #153718 0%, #0a160b 35%, #030503 76%), #030503;
+  opacity: 1; visibility: visible;
+  transition: opacity .7s ease, visibility .7s ease;
+}
+.welcome-splash::before,
+.welcome-splash::after {
+  content: ""; position: absolute; width: min(78vw, 680px); aspect-ratio: 1;
+  border: 1px solid #39ff1425; border-radius: 50%;
+  box-shadow: 0 0 80px #39ff140b, inset 0 0 80px #39ff1408;
+  animation: welcome-orbit 9s linear infinite;
+}
+.welcome-splash::after {
+  width: min(58vw, 500px); border-color: #39ff141b;
+  animation-direction: reverse; animation-duration: 13s;
+}
+.welcome-splash.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+.welcome-content { position: relative; z-index: 1; width: min(900px, 100%); text-align: center; }
+
+/* YOUR COMMUNITY IMAGE IN THE WELCOME SCREEN */
+.welcome-mark {
+  width: 90px; height: 90px;
+  display: grid; place-items: center;
+  overflow: hidden;
+  margin: 0 auto 27px;
+  border: 2px solid var(--green);
+  border-radius: 20px;
+  background: #091309;
+  box-shadow: 0 0 32px #39ff1433;
+  animation: welcome-mark-pulse 1.8s ease-in-out infinite;
+}
+.welcome-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.welcome-kicker { margin-bottom: 12px; color: #d8f6d2; font-size: clamp(13px, 2vw, 18px); font-weight: 900; letter-spacing: .38em; }
+.welcome-title {
+  color: var(--green); font-size: clamp(38px, 8vw, 82px); font-weight: 1000;
+  line-height: 1.12; letter-spacing: clamp(1px, .5vw, 6px);
+  text-shadow: 0 0 12px #39ff1466, 0 0 36px #39ff143d;
+  animation: welcome-title-glow 2s ease-in-out infinite alternate;
+}
+.welcome-title span { display: block; }
+.welcome-tagline { margin-top: 22px; color: #c3d1c3; font-size: clamp(11px, 1.8vw, 15px); font-weight: 700; letter-spacing: .22em; }
+.welcome-loading { width: min(230px, 65%); height: 3px; margin: 36px auto 0; overflow: hidden; border-radius: 99px; background: #263b2b; }
+.welcome-loading span { display: block; width: 42%; height: 100%; border-radius: inherit; background: var(--green); box-shadow: 0 0 12px var(--green); animation: welcome-load 2.6s ease-in-out forwards; }
+
+@keyframes welcome-load { from { transform: translateX(-110%); } to { transform: translateX(250%); } }
+@keyframes welcome-title-glow { from { text-shadow: 0 0 9px #39ff1455, 0 0 24px #39ff142b; } to { text-shadow: 0 0 17px #39ff1499, 0 0 48px #39ff1455; } }
+@keyframes welcome-mark-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+@keyframes welcome-orbit { from { transform: rotate(0deg) scale(1); } to { transform: rotate(360deg) scale(1.025); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-splash, .welcome-mark, .welcome-title, .welcome-splash::before, .welcome-splash::after,
+  .welcome-loading span { animation: none !important; transition: opacity .01ms, visibility .01ms !important; }
+}
+
+a { color: inherit; }
+
+header {
+  position: sticky; top: 0; z-index: 20; padding: 13px 5%;
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  background: #101410; border-bottom: 2px solid var(--green);
+}
+.logo { display: flex; align-items: center; gap: 12px; color: var(--green); font-size: 22px; font-weight: 900; letter-spacing: 1px; cursor: pointer; }
+
+/* YOUR COMMUNITY IMAGE IN THE HEADER */
+.logo-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid var(--green);
+  border-radius: 11px;
+  background: #071007;
+}
+.logo-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.header-balance { width: 50px; height: 50px; display: grid; place-items: center; border: 2px solid var(--green); border-radius: 50%; background: radial-gradient(circle, #1c351d, #071007); color: var(--green); cursor: pointer; box-shadow: 0 0 16px #39ff1420; }
+.header-balance span { display: block; font-size: 9px; font-weight: 900; line-height: 1; }
+.header-balance strong { display: block; max-width: 42px; overflow: hidden; font-size: 12px; line-height: 1.2; }
+
+.hero { padding: 55px 20px 28px; text-align: center; background: radial-gradient(ellipse at top, #183219 0, #0a100a 45%, #050705 78%); }
+.hero h1 { margin-bottom: 14px; font-size: clamp(30px, 5vw, 46px); line-height: 1.25; }
+.green { color: var(--green); }
+.fancy { font-weight: 900; letter-spacing: 1px; }
+.hero p { max-width: 650px; margin: 0 auto 23px; color: #c5cec5; line-height: 1.8; }
+.btn { display: inline-block; margin: 5px; padding: 12px 20px; border: 0; border-radius: 8px; background: var(--green); color: #061006; text-decoration: none; font-weight: 900; cursor: pointer; transition: .2s; }
+.btn:hover { background: #fff; transform: translateY(-2px); }
+.btn.secondary { border: 1px solid #3c6041; background: #182219; color: #eaffea; }
+
+[hidden] { display: none !important; }
+.home-intro { max-width: 690px; margin: 0 auto; color: #c5cec5; line-height: 1.8; }
+.home-balance-wrap { width: min(920px, 92%); margin: 12px auto 28px; display: flex; justify-content: center; }
+.home-balance-card { width: min(100%, 430px); display: flex; align-items: center; justify-content: center; gap: 22px; padding: 18px 24px; border: 1px solid #315a35; border-radius: 18px; background: linear-gradient(135deg, #142515, #0b100b); box-shadow: 0 10px 30px #0005; }
+.home-balance-circle { width: 112px; height: 112px; flex: 0 0 112px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 3px solid var(--green); border-radius: 50%; background: radial-gradient(circle, #1d3a1d, #071007 72%); box-shadow: 0 0 22px #39ff1430, inset 0 0 18px #39ff1418; }
+.home-balance-circle strong { color: var(--green); font-size: 27px; line-height: 1.1; }
+.home-balance-circle span { margin-top: 5px; color: #d7f5d2; font-size: 9px; font-weight: 900; letter-spacing: 1px; }
+.home-balance-copy { text-align: left; }
+.home-balance-copy small { color: #aeb9ae; font-size: 11px; font-weight: 900; letter-spacing: 1.2px; }
+.home-balance-copy h2 { margin: 6px 0; color: #fff; font-size: 18px; }
+.home-balance-copy p { color: #aeb9ae; font-size: 12px; line-height: 1.6; }
+.home-menu { width: min(1050px, 92%); margin: 0 auto 42px; }
+.home-menu-title { margin-bottom: 17px; color: var(--green); text-align: center; font-size: 19px; letter-spacing: 1px; }
+.home-menu-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
+.home-tile { min-height: 174px; padding: 20px 15px; border: 1px solid #2a402d; border-radius: 15px; background: linear-gradient(155deg, #151d15, #0b100b); color: #fff; text-align: center; cursor: pointer; transition: .2s; }
+.home-tile:hover, .home-tile:focus-visible { transform: translateY(-4px); border-color: var(--green); box-shadow: 0 9px 24px #0007, 0 0 16px #39ff1415; outline: none; }
+.home-tile-icon { display: block; margin-bottom: 12px; font-size: 36px; }
+.home-tile strong { display: block; margin-bottom: 8px; color: var(--green); font-size: 15px; letter-spacing: .7px; }
+.home-tile small { display: block; min-height: 34px; color: #b7c1b7; font-size: 12px; line-height: 1.5; }
+.home-tile .tile-open { display: inline-block; margin-top: 13px; color: #e4f9e2; font-size: 10px; font-weight: 900; letter-spacing: 1px; }
+.view-toolbar { position: sticky; top: 74px; z-index: 15; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 auto 25px; padding: 11px 13px; border: 1px solid #2a402d; border-radius: 12px; background: #101710f2; backdrop-filter: blur(8px); }
+.view-toolbar-title { color: var(--green); font-size: 14px; font-weight: 900; letter-spacing: .9px; }
+.back-home { padding: 10px 14px; border: 1px solid #3b5b3e; border-radius: 8px; background: #19251a; color: #efffef; font-size: 12px; font-weight: 900; cursor: pointer; }
+.back-home:hover { border-color: var(--green); color: var(--green); }
+.home-notice { width: min(900px, 92%); margin: 0 auto 35px; }
+
+@media (max-width: 850px) {
+  .home-menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  header { padding: 11px 4%; }
+  .logo { font-size: 17px; gap: 8px; }
+  .logo-mark { width: 42px; height: 42px; }
+  .header-balance { width: 45px; height: 45px; }
+  .hero { padding: 42px 15px 22px; }
+  .home-balance-card { gap: 13px; padding: 15px; }
+  .home-balance-circle { width: 94px; height: 94px; flex-basis: 94px; }
+  .home-balance-circle strong { font-size: 23px; }
+  .home-balance-copy h2 { font-size: 15px; }
+  .home-menu-grid { gap: 10px; }
+  .home-tile { min-height: 158px; padding: 16px 10px; }
+  .home-tile-icon { font-size: 30px; }
+  .view-toolbar { top: 66px; }
+}
+
+.container { width: min(1100px, 92%); margin: 25px auto 55px; }
+.section { margin: 0 0 46px; scroll-margin-top: 100px; }
+.section-title { margin: 0 0 18px; color: var(--green); font-size: 24px; letter-spacing: .7px; }
+.wallet { padding: 29px; border: 1px solid var(--green); border-radius: 16px; text-align: center; background: linear-gradient(135deg, #173817, #101710); }
+.wallet-kicker { color: #d7f5d2; font-size: 12px; font-weight: 800; letter-spacing: 2px; }
+.wallet h2 { margin-top: 9px; font-size: 21px; }
+.points { margin: 13px 0 5px; color: var(--green); font-size: clamp(36px, 6vw, 48px); font-weight: 900; }
+.wallet-unit { color: #e7f4e7; font-size: 13px; font-weight: 800; letter-spacing: 1px; }
+.muted { color: var(--muted); font-size: 14px; line-height: 1.7; }
+.wallet .muted { max-width: 620px; margin: 13px auto 0; }
+.card { min-width: 0; padding: 23px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); text-align: center; transition: .2s; }
+.card:hover { border-color: var(--green); transform: translateY(-3px); }
+.card h3 { margin: 0 0 12px; color: var(--green); font-size: 21px; letter-spacing: .8px; }
+.card p { margin-bottom: 13px; color: #c8d0c8; line-height: 1.65; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(225px, 1fr)); gap: 19px; }
+.product-image { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 17px; padding: 8px; border: 1px solid #1d2a1f; border-radius: 11px; background: #080d08; }
+.product-image img { width: 100%; height: 100%; object-fit: contain; }
+.product-image.gta { height: 190px; padding: 0; }
+.product-image.gta img { object-fit: cover; object-position: center 58%; }
+.price { margin: 15px 0; color: var(--green); font-size: 22px; font-weight: 900; }
+.coming { display: inline-block; padding: 10px 16px; border-radius: 7px; background: #292f29; color: #c6d0c6; font-size: 12px; font-weight: 800; letter-spacing: .5px; }
+
+.kick-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 15px; }
+.kick-brand { display: inline-flex; align-items: center; gap: 9px; color: #fff; font-weight: 900; letter-spacing: 1px; }
+.kick-symbol { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 9px; background: #53fc18; color: #071006; font-weight: 1000; }
+.channel-tag { padding: 7px 11px; border: 1px solid #315b35; border-radius: 999px; color: #caffc3; background: #102012; font-size: 12px; font-weight: 800; }
+.live-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(310px, .8fr); gap: 17px; align-items: stretch; }
+.live-panel { min-width: 0; overflow: hidden; padding: 14px; border: 1px solid var(--line); border-radius: 15px; background: var(--panel); }
+.live-panel h3 { margin: 2px 0 12px; color: var(--green); font-size: 17px; letter-spacing: .7px; }
+.player-frame { display: block; width: 100%; aspect-ratio: 16 / 9; min-height: 260px; border: 1px solid #253629; border-radius: 11px; background: #090d09; }
+.chat-frame { display: block; width: 100%; height: 570px; border: 1px solid #253629; border-radius: 11px; background: #090d09; }
+.embed-note { margin: 10px 2px 0; color: #9da99e; font-size: 11px; line-height: 1.55; }
+
+.leaderboard-intro { margin: -7px 0 20px; text-align: center; }
+.leaderboard-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; }
+.rank-card { min-width: 0; padding: 23px 18px 21px; border: 1px solid #354638; border-radius: 16px; background: linear-gradient(160deg, #141b14, #0c100d); text-align: center; }
+.rank-card.first { border-color: #d9b44a; box-shadow: 0 0 24px #b9902220; }
+.rank-card.second { border-color: #aeb9c5; }
+.rank-card.third { border-color: #b8794e; }
+.rank-label { display: inline-block; margin-bottom: 13px; padding: 6px 12px; border-radius: 999px; background: #202920; color: #e9f4e9; font-size: 11px; font-weight: 900; letter-spacing: 1px; }
+.rank-card.first .rank-label { background: #3a3015; color: #f5d77a; }
+.rank-medal { margin-right: 5px; font-size: 18px; vertical-align: -2px; }
+.avatar { width: 88px; height: 88px; display: grid; place-items: center; overflow: hidden; margin: 0 auto 14px; border: 3px solid var(--green); border-radius: 50%; background: #1b2b1d; color: var(--green); font-size: 30px; font-weight: 900; }
+.rank-card.first .avatar { border-color: #d9b44a; }
+.rank-card.second .avatar { border-color: #aeb9c5; }
+.rank-card.third .avatar { border-color: #b8794e; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.rank-name { margin: 8px 0 12px; color: #fff; font-size: 17px; font-weight: 900; overflow-wrap: anywhere; }
+.rank-points-box { display: inline-flex; flex-direction: column; gap: 4px; min-width: 135px; padding: 10px 16px; border: 1px solid #2a492d; border-radius: 10px; background: #0a130b; }
+.rank-points { color: var(--green); font-size: 20px; font-weight: 900; }
+.rank-points-caption { color: #aeb9ae; font-size: 10px; font-weight: 800; letter-spacing: .9px; }
+.rank-empty { color: #9ba59b; font-size: 13px; line-height: 1.6; padding: 8px 0; }
+.notice { margin: 28px 0 0; padding: 17px 19px; border: 1px solid #465146; border-radius: 10px; background: #101410; color: #c7d0c7; font-size: 13px; line-height: 1.8; }
+footer { padding: 25px; border-top: 1px solid var(--line); background: #101410; color: #9ca69c; text-align: center; }
+
+.help-launcher { position: fixed; right: 20px; bottom: 20px; z-index: 50; width: 56px; height: 56px; display: grid; place-items: center; border: 2px solid #071007; border-radius: 50%; background: var(--green); color: #071007; box-shadow: 0 5px 25px #0009; cursor: pointer; font-size: 25px; }
+.help-label { position: fixed; right: 86px; bottom: 31px; z-index: 49; padding: 9px 12px; border: 1px solid #36513a; border-radius: 8px; background: #142015; color: #eaffea; font-size: 12px; font-weight: 800; box-shadow: 0 4px 14px #0008; }
+.help-panel { position: fixed; right: 20px; bottom: 88px; z-index: 51; display: none; width: min(365px, calc(100vw - 30px)); overflow: hidden; border: 1px solid #47734b; border-radius: 15px; background: #101610; box-shadow: 0 12px 45px #000b; }
+.help-panel.open { display: block; }
+.help-head { display: flex; justify-content: space-between; align-items: center; padding: 15px 17px; border-bottom: 1px solid #304b33; background: #172719; }
+.help-head strong { color: var(--green); letter-spacing: .5px; }
+.close-help { padding: 0 4px; border: 0; background: transparent; color: #fff; font-size: 23px; cursor: pointer; }
+.help-body { padding: 17px; }
+.help-body p { margin-bottom: 13px; color: #b9c5b9; font-size: 13px; line-height: 1.6; }
+.help-body label { display: block; margin: 12px 0 6px; color: #dce8dc; font-size: 12px; font-weight: 800; }
+.help-body input, .help-body select, .help-body textarea { width: 100%; padding: 11px; border: 1px solid #344a37; border-radius: 8px; outline: none; background: #080d08; color: #fff; font-size: 14px; }
+.help-body textarea { min-height: 110px; resize: vertical; }
+.help-body input:focus, .help-body select:focus, .help-body textarea:focus { border-color: var(--green); }
+.help-submit { width: 100%; margin: 14px 0 0; }
+.form-status { min-height: 18px; margin-top: 10px; color: #b9c5b9; font-size: 12px; line-height: 1.5; }
+
+@media (max-width: 850px) {
+  .live-layout { grid-template-columns: 1fr; }
+  .chat-frame { height: 560px; }
+  .leaderboard-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+}
+@media (max-width: 600px) {
+  header { justify-content: space-between; text-align: left; }
+  .hero { padding: 42px 15px 22px; }
+  .chat-frame { height: 520px; }
+  .help-label { display: none; }
+  .wallet { padding: 24px 15px; }
+}
+</style>
+</head>
+
+<body class="welcome-active">
+
+<div class="welcome-splash" id="welcome-splash" role="status" aria-label="Welcome to MY COMMUNITY">
+  <div class="welcome-content">
+
+    <!-- YOUR IMAGE -->
+    <div class="welcome-mark">
+      <img src="community.jpg" alt="MY COMMUNITY Logo">
+    </div>
+
+    <div class="welcome-kicker">WELCOME TO</div>
+    <h1 class="welcome-title">
+      <span>𝙈𝙔</span>
+      <span>𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔</span>
+    </h1>
+    <p class="welcome-tagline">YOUR COMMUNITY · YOUR WORLD</p>
+    <div class="welcome-loading" aria-hidden="true"><span></span></div>
+  </div>
+</div>
+
+<header>
+  <div class="logo" role="button" tabindex="0" data-open-view="home" aria-label="Go to Home">
+
+    <!-- YOUR IMAGE IN THE HEADER -->
+    <div class="logo-mark">
+      <img src="community.jpg" alt="MY COMMUNITY Logo">
+    </div>
+
+    <span>𝙈𝙔 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔</span>
+  </div>
+
+  <button class="header-balance" type="button" data-open-view="wallet" aria-label="Open my points wallet" title="MY COMMUNITY POINTS">
+    <span>MCP</span><strong>0</strong>
+  </button>
+</header>
+
+<div id="home-screen">
+  <section class="hero" id="home">
+    <h1 class="fancy">𝙒𝙀𝙇𝘾𝙊𝙈𝙀 𝙏𝙊 <span class="green">𝙈𝙔 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔</span></h1>
+    <p class="home-intro">Your Community, Your World!<br>Choose where you want to go. Your community tools are all here.</p>
+  </section>
+
+  <div class="home-balance-wrap">
+    <button class="home-balance-card" type="button" data-open-view="wallet" aria-label="Open MY COMMUNITY points wallet">
+      <span class="home-balance-circle"><strong>0</strong><span>POINTS</span></span>
+      <span class="home-balance-copy">
+        <small>YOUR BALANCE</small>
+        <h2>𝙈𝙔 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔<br>𝙋𝙊𝙄𝙉𝙏𝙎</h2>
+        <p>Tap here to view your points wallet</p>
+      </span>
+    </button>
+  </div>
+
+  <section class="home-menu" aria-label="Main menu">
+    <h2 class="home-menu-title">𝘾𝙃𝙊𝙊𝙎𝙀 𝙔𝙊𝙐𝙍 𝘿𝙀𝙎𝙏𝙄𝙉𝘼𝙏𝙄𝙊𝙉</h2>
+    <div class="home-menu-grid">
+
+      <button class="home-tile" type="button" data-open-view="wallet">
+        <span class="home-tile-icon">💰</span>
+        <strong>𝙈𝙔 𝙒𝘼𝙇𝙇𝙀𝙏</strong>
+        <small>Check your MY COMMUNITY points balance.</small>
+        <span class="tile-open">OPEN WALLET →</span>
+      </button>
+
+      <button class="home-tile" type="button" data-open-view="store">
+        <span class="home-tile-icon">🛒</span>
+        <strong>𝙍𝙀𝙒𝘼𝙍𝘿𝙎 𝙎𝙏𝙊𝙍𝙀</strong>
+        <small>Explore Free Fire, Steam and GTA rewards.</small>
+        <span class="tile-open">OPEN STORE →</span>
+      </button>
+
+      <button class="home-tile" type="button" data-open-view="live">
+        <span class="home-tile-icon">🔴</span>
+        <strong>𝙇𝙄𝙑𝙀 𝘾𝙃𝘼𝙏</strong>
+        <small>Watch ZX-MAHDI and join the live chat.</small>
+        <span class="tile-open">JOIN LIVE →</span>
+      </button>
+
+      <button class="home-tile" type="button" data-open-view="leaderboard">
+        <span class="home-tile-icon">🏆</span>
+        <strong>𝙏𝙊𝙋 3 𝙈𝙀𝙈𝘽𝙀𝙍𝙎</strong>
+        <small>See the top community members and their points.</small>
+        <span class="tile-open">VIEW TOP 3 →</span>
+      </button>
+
+    </div>
+  </section>
+
+  <div class="notice home-notice">
+    <strong class="green">NOTE:</strong>
+    MY COMMUNITY points are independent from Kick Channel Points. Your balance and the Top 3 will show real member data when the MY COMMUNITY account and points system is activated.
+  </div>
+</div>
+
+<main class="container">
+
+  <div class="view-toolbar" id="view-toolbar" hidden>
+    <button class="back-home" type="button" data-open-view="home">← 𝙃𝙊𝙈𝙀</button>
+    <span class="view-toolbar-title" id="view-toolbar-title">MY WALLET</span>
+    <button class="back-home" type="button" data-open-view="home">𝙈𝙀𝙉𝙐</button>
+  </div>
+
+  <section class="section" id="wallet" data-page-view hidden>
+    <h2 class="section-title">𝙈𝙔 𝙒𝘼𝙇𝙇𝙀𝙏 💰</h2>
+    <div class="wallet">
+      <div class="wallet-kicker">YOUR COMMUNITY BALANCE</div>
+      <h2>𝙈𝙔 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔 𝙋𝙊𝙄𝙉𝙏𝙎</h2>
+      <div class="points">0</div>
+      <div class="wallet-unit">MY COMMUNITY POINTS</div>
+      <p class="muted">This is your MY COMMUNITY points wallet. Your balance will appear here when member accounts and the points system are activated.</p>
+    </div>
+  </section>
+
+  <section class="section" id="store" data-page-view hidden>
+    <h2 class="section-title">𝙍𝙀𝙒𝘼𝙍𝘿𝙎 𝙎𝙏𝙊𝙍𝙀 🛒</h2>
+    <div class="grid">
+
+      <article class="card">
+        <div class="product-image">
+          <img src="https://cdn.gosteisalvei.com/logo-de-diamante-free-fire-png-preview.png" alt="Free Fire diamonds" loading="lazy">
+        </div>
+        <h3>𝙁𝙍𝙀𝙀 𝙁𝙄𝙍𝙀</h3>
+        <p>1000 💎 Free Fire Diamonds</p>
+        <div class="price">6,000 POINTS</div>
+        <span class="coming">COMING SOON</span>
+      </article>
+
+      <article class="card">
+        <div class="product-image">
+          <img src="https://prezentidealny.com/1001-large_default/e-karta-podarunkowa-steam-wallet-110-zl.jpg" alt="Steam gift card" loading="lazy">
+        </div>
+        <h3>𝙎𝙏𝙀𝘼𝙈</h3>
+        <p>Steam Gift Card</p>
+        <div class="price">10,000 POINTS</div>
+        <span class="coming">COMING SOON</span>
+      </article>
+
+      <article class="card">
+        <div class="product-image gta">
+          <img src="/assets/gta-reward.png" alt="GTA gaming reward artwork">
+        </div>
+        <h3>𝙂𝙏𝘼 𝙑</h3>
+        <p>GTA Gaming Reward</p>
+        <div class="price">8,000 POINTS</div>
+        <span class="coming">COMING SOON</span>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="section" id="live" data-page-view hidden>
+    <div class="kick-heading">
+      <h2 class="section-title" style="margin:0">𝙇𝙄𝙑𝙀 𝘾𝙃𝘼𝙏 🔴</h2>
+      <span class="channel-tag">KICK · zx-mahdi</span>
+    </div>
+
+    <div class="live-layout">
+      <div class="live-panel">
+        <div class="kick-heading">
+          <div class="kick-brand">
+            <span class="kick-symbol">K</span>
+            <span>𝙕𝙓-𝙈𝘼𝙃𝘿𝙄</span>
+          </div>
+          <span class="channel-tag">KICK PLAYER</span>
+        </div>
+        <iframe class="player-frame" src="https://player.kick.com/zx-mahdi" title="ZX Mahdi Kick livestream" allowfullscreen="true" loading="lazy"></iframe>
+        <p class="embed-note">The official Kick player displays your channel stream here. If the channel is offline, Kick will show its offline screen.</p>
+      </div>
+
+      <div class="live-panel">
+        <div class="kick-heading">
+          <h3>𝙇𝙄𝙑𝙀 𝘾𝙃𝘼𝙏</h3>
+          <span class="channel-tag">CHAT</span>
+        </div>
+        <iframe class="chat-frame" src="https://chat.kick.cx/embed/zx-mahdi" title="ZX Mahdi embedded Kick chat" loading="lazy" allow="clipboard-write"></iframe>
+        <p class="embed-note">Chat is provided by KickCX, an independent third-party service (not affiliated with Kick). Sign in through the chat panel to send messages. Check its sign-in page before authorizing your Kick account.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="leaderboard" data-page-view hidden>
+    <h2 class="section-title" style="text-align:center">𝙏𝙊𝙋 3 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔 𝙈𝙀𝙈𝘽𝙀𝙍𝙎 🏆</h2>
+    <p class="muted leaderboard-intro">Members are ranked automatically by their MY COMMUNITY points.</p>
+
+    <div class="leaderboard-grid" id="leaderboard-list" aria-live="polite">
+      <article class="rank-card first">
+        <div class="rank-label"><span class="rank-medal">🥇</span> TOP 1</div>
+        <div class="avatar">?</div>
+        <div class="rank-name">Waiting for member</div>
+        <div class="rank-points-box">
+          <span class="rank-points">0</span>
+          <span class="rank-points-caption">MY COMMUNITY POINTS</span>
+        </div>
+      </article>
+
+      <article class="rank-card second">
+        <div class="rank-label"><span class="rank-medal">🥈</span> TOP 2</div>
+        <div class="avatar">?</div>
+        <div class="rank-name">Waiting for member</div>
+        <div class="rank-points-box">
+          <span class="rank-points">0</span>
+          <span class="rank-points-caption">MY COMMUNITY POINTS</span>
+        </div>
+      </article>
+
+      <article class="rank-card third">
+        <div class="rank-label"><span class="rank-medal">🥉</span> TOP 3</div>
+        <div class="avatar">?</div>
+        <div class="rank-name">Waiting for member</div>
+        <div class="rank-points-box">
+          <span class="rank-points">0</span>
+          <span class="rank-points-caption">MY COMMUNITY POINTS</span>
+        </div>
+      </article>
+    </div>
+
+    <p class="notice">
+      <strong class="green">NOTE:</strong>
+      This leaderboard ranks MY COMMUNITY points only. It does not read Kick Channel Points.
+    </p>
+  </section>
+
+</main>
+
+<footer>© 2026 <span class="green">𝙈𝙔 𝘾𝙊𝙈𝙈𝙐𝙉𝙄𝙏𝙔</span>. All Rights Reserved.</footer>
+
+<div class="help-label" aria-hidden="true">DEVELOPER SUPPORT</div>
+
+<button class="help-launcher" id="help-toggle" type="button" aria-label="Developer support" aria-expanded="false" title="Developer support">🎧</button>
+
+<section class="help-panel" id="help-panel" aria-label="Developer support" aria-hidden="true">
+  <div class="help-head">
+    <strong>🎧 DEVELOPER SUPPORT</strong>
+    <button class="close-help" id="help-close" type="button" aria-label="Close">×</button>
+  </div>
+
+  <form class="help-body" id="report-form">
+    <p>Tell the developer about a bug, a problem, or an idea. Your message will be saved for review.</p>
+
+    <label for="report-name">Your name (optional)</label>
+    <input id="report-name" name="name" maxlength="50" placeholder="Your Kick username">
+
+    <label for="report-type">Message type</label>
+    <select id="report-type" name="type">
+      <option value="problem">Report a problem</option>
+      <option value="bug">Website bug</option>
+      <option value="idea">Suggestion / idea</option>
+      <option value="other">Other</option>
+    </select>
+
+    <label for="report-message">Your message</label>
+    <textarea id="report-message" name="message" maxlength="1500" required placeholder="Write your message to the developer..."></textarea>
+
+    <button class="btn help-submit" id="report-submit" type="submit">𝙎𝙀𝙉𝘿 𝙈𝙀𝙎𝙎𝘼𝙂𝙀</button>
+    <div class="form-status" id="report-status" role="status" aria-live="polite"></div>
+  </form>
+</section>
+
+<script>
+// Welcome screen
+const welcomeSplash = document.getElementById('welcome-splash');
+
+window.setTimeout(() => {
+  welcomeSplash.classList.add('is-leaving');
+  document.body.classList.remove('welcome-active');
+  window.setTimeout(() => welcomeSplash.remove(), 750);
+}, 2800);
+
+// Navigation
+const homeScreen = document.getElementById('home-screen');
+const viewToolbar = document.getElementById('view-toolbar');
+const viewToolbarTitle = document.getElementById('view-toolbar-title');
+const pageViews = Array.from(document.querySelectorAll('[data-page-view]'));
+
+const viewTitles = {
+  wallet: '𝙈𝙔 𝙒𝘼𝙇𝙇𝙀𝙏',
+  store: '𝙍𝙀𝙒𝘼𝙍𝘿𝙎 𝙎𝙏𝙊𝙍𝙀',
+  live: '𝙇𝙄𝙑𝙀 𝘾𝙃𝘼𝙏',
+  leaderboard: '𝙏𝙊𝙋 3 𝙈𝙀𝙈𝘽𝙀𝙍𝙎'
+};
+
+function showView(viewName, updateAddress = true) {
+  const validView = viewName === 'home' || pageViews.some((section) => section.id === viewName);
+  if (!validView) viewName = 'home';
+
+  const isHome = viewName === 'home';
+  homeScreen.hidden = !isHome;
+
+  pageViews.forEach((section) => {
+    section.hidden = section.id !== viewName;
+  });
+
+  viewToolbar.hidden = isHome;
+
+  if (!isHome) {
+    viewToolbarTitle.textContent = viewTitles[viewName] || viewName.toUpperCase();
+  }
+
+  if (updateAddress) {
+    const nextUrl = isHome ? window.location.pathname : `${window.location.pathname}#${viewName}`;
+    window.history.pushState({ view: viewName }, '', nextUrl);
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (viewName === 'leaderboard') {
+    loadLeaderboard();
+  }
+}
+
+document.querySelectorAll('[data-open-view]').forEach((control) => {
+  control.addEventListener('click', () => showView(control.dataset.openView));
+});
+
+document.querySelector('.logo').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    showView('home');
+  }
+});
+
+window.addEventListener('popstate', () => {
+  const view = window.location.hash.replace('#', '') || 'home';
+  showView(view, false);
+});
+
+showView('home', false);
+
+// Developer support
+const helpPanel = document.getElementById('help-panel');
+const helpToggle = document.getElementById('help-toggle');
+
+function setHelpOpen(open) {
+  helpPanel.classList.toggle('open', open);
+  helpPanel.setAttribute('aria-hidden', String(!open));
+  helpToggle.setAttribute('aria-expanded', String(open));
+}
+
+helpToggle.addEventListener('click', () => {
+  setHelpOpen(!helpPanel.classList.contains('open'));
+});
+
+document.getElementById('help-close').addEventListener('click', () => {
+  setHelpOpen(false);
+});
+
+// Send report
+document.getElementById('report-form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const submit = document.getElementById('report-submit');
+  const status = document.getElementById('report-status');
+
+  const payload = {
+    name: form.elements.name.value.trim(),
+    type: form.elements.type.value,
+    message: form.elements.message.value.trim()
+  };
+
+  if (!payload.message) {
+    status.textContent = 'Please write your message first.';
+    return;
+  }
+
+  submit.disabled = true;
+  submit.textContent = 'SENDING...';
+  status.textContent = '';
+
+  try {
+    const response = await fetch('/api/reports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Could not send the report.');
+    }
+
+    status.textContent = 'Message saved successfully. Thank you!';
+    form.elements.message.value = '';
+
+  } catch (error) {
+    status.textContent = 'Could not send. Make sure the website server is running and try again.';
+  } finally {
+    submit.disabled = false;
+    submit.textContent = '𝙎𝙀𝙉𝘿 𝙈𝙀𝙎𝙎𝘼𝙂𝙀';
+  }
+});
+
+// Leaderboard
+async function loadLeaderboard() {
+  const container = document.getElementById('leaderboard-list');
+
+  try {
+    const response = await fetch('/api/leaderboard');
+
+    if (!response.ok) {
+      throw new Error('Leaderboard unavailable');
+    }
+
+    const result = await response.json();
+    const members = Array.isArray(result.members) ? result.members.slice(0, 3) : [];
+
+    const medals = ['🥇', '🥈', '🥉'];
+    const labels = ['TOP 1', 'TOP 2', 'TOP 3'];
+    const classes = ['first', 'second', 'third'];
+
+    container.replaceChildren();
+
+    for (let i = 0; i < 3; i++) {
+      const member = members[i];
+
+      const article = document.createElement('article');
+      article.className = 'rank-card ' + classes[i];
+
+      const label = document.createElement('div');
+      label.className = 'rank-label';
+
+      const medal = document.createElement('span');
+      medal.className = 'rank-medal';
+      medal.textContent = medals[i];
+
+      label.append(medal, document.createTextNode(' ' + labels[i]));
+
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+
+      const name = document.createElement('div');
+      name.className = 'rank-name';
+
+      const pointsBox = document.createElement('div');
+      pointsBox.className = 'rank-points-box';
+
+      const score = document.createElement('span');
+      score.className = 'rank-points';
+
+      const caption = document.createElement('span');
+      caption.className = 'rank-points-caption';
+      caption.textContent = 'MY COMMUNITY POINTS';
+
+      if (member) {
+        const displayName = String(member.name || 'Community member').slice(0, 50);
+
+        if (typeof member.avatarUrl === 'string' && /^https:\/\//i.test(member.avatarUrl)) {
+          const img = document.createElement('img');
+          img.src = member.avatarUrl;
+          img.alt = displayName;
+          img.referrerPolicy = 'no-referrer';
+
+          img.onerror = () => {
+            avatar.replaceChildren();
+            avatar.textContent = displayName.charAt(0).toUpperCase();
+          };
+
+          avatar.appendChild(img);
+        } else {
+          avatar.textContent = displayName.charAt(0).toUpperCase();
+        }
+
+        name.textContent = displayName;
+        score.textContent = Math.max(0, Math.floor(Number(member.points || 0))).toLocaleString();
+
+      } else {
+        avatar.textContent = '?';
+        name.textContent = 'Waiting for member';
+        score.textContent = '0';
+      }
+
+      pointsBox.append(score, caption);
+      article.append(label, avatar, name, pointsBox);
+      container.appendChild(article);
+    }
+
+  } catch (error) {
+    container.innerHTML = '<p class="muted">Leaderboard is temporarily unavailable.</p>';
+  }
+}
+
+loadLeaderboard();
+setInterval(loadLeaderboard, 30000);
+</script>
+
+</body>
+</html>
